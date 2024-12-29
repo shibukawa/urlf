@@ -8,7 +8,7 @@ import (
 
 func ExampleUrtf() {
 	url := urlf.Urlf("http://example.com/{}/", 1000)
-	fmt.Println(url.String())
+	fmt.Println(url)
 	// Output: http://example.com/1000/
 }
 
@@ -18,6 +18,6 @@ func ExampleCustomFormatter() {
 		Protocol: "https",
 	})
 	url := formatter("http://api-server/api/users/{}", 1000)
-	fmt.Println(url.String())
+	fmt.Println(url)
 	// Output: https://api.example.com/api/users/1000
 }
