@@ -27,8 +27,6 @@ type Opt struct {
 // Generated function has same signature with Urlf.
 // But it can be customized by Opt.
 //
-// *
-//
 // It is a "Must" version of TryCustomFormatter.
 func CustomFormatter(o Opt) func(format string, args ...any) string {
 	f := TryCustomFormatter(o)
@@ -271,10 +269,14 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (string, error) 
 // So, it raise panic instead of return error.
 //
 // If you want to get parsing error, use TryUrlf, instead.
-var Urlf = CustomFormatter(Opt{})
+func Urlf(format string, args ...any) string {
+	return CustomFormatter(Opt{})(format, args...)
+}
 
 // TryUrlf is a similar function to Urlf, but it returns an error if the format is invalid.
-var TryUrlf = TryCustomFormatter(Opt{})
+func TryUrlf(format string, args ...any) (string, error) {
+	return TryCustomFormatter(Opt{})(format, args...)
+}
 
 var hostPattern = regexp.MustCompile(`^(?P<protocol>\w+:\/\/)?(?P<hostname>[^:]+)(?P<port>:\d+)?`)
 
