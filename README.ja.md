@@ -45,7 +45,7 @@ path        := "api/users"
 queryValue  := "value"
 querySet, _ := url.ParseQuery("key1=value1&key2=value2")
 fragment    := "fragment"
-url.Urlf(`{}://{}:{}/{}?queryKey={}&{}#{}`, protocol, hostname, port, queryValue, querySet, fragment)
+urlf.Urlf(`{}://{}:{}/{}?queryKey={}&{}#{}`, protocol, hostname, port, queryValue, querySet, fragment)
 ```
 
 プレースホルダはそれぞれの区切り記号（`://`、`:`、`/`、`?`、`=`、`&`、`#`）の間にしか書けず、展開された文字列は適切にエスケープされます。
@@ -60,7 +60,7 @@ urlf.Urlf(`https://example.com/menu/{}`, areaList)
 // => 'https://example.com/menu/japan/tokyo/shinjuku'
 
 areaStr := "japan/tokyo/shinjuku";
-urlf.Urlf`https://example.com/menu/{}`, areaStr)
+urlf.Urlf(`https://example.com/menu/{}`, areaStr)
 // => 'https://example.com/menu/japan/tokyo/shinjuku'
 ```
 

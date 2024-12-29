@@ -43,7 +43,7 @@ path        := "api/users"
 queryValue  := "value"
 querySet, _ := url.ParseQuery("key1=value1&key2=value2")
 fragment    := "fragment"
-url.Urlf(`{}://{}:{}/{}?queryKey={}&{}#{}`, protocol, hostname, port, queryValue, querySet, fragment)
+urlf.Urlf(`{}://{}:{}/{}?queryKey={}&{}#{}`, protocol, hostname, port, queryValue, querySet, fragment)
 ```
 
 Placeholder can be written only between each delimiter (`://`, `:`, `/`, `?`, `=`, `&`, `#`) and interpolated strings are escaped properly.
@@ -58,7 +58,7 @@ urlf.Urlf(`https://example.com/menu/{}`, areaList)
 // => 'https://example.com/menu/japan/tokyo/shinjuku'
 
 areaStr := "japan/tokyo/shinjuku";
-urlf.Urlf`https://example.com/menu/{}`, areaStr)
+urlf.Urlf(`https://example.com/menu/{}`, areaStr)
 // => 'https://example.com/menu/japan/tokyo/shinjuku'
 ```
 
