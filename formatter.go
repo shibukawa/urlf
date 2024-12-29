@@ -30,9 +30,9 @@ type Opt struct {
 // *
 //
 // It is a "Must" version of TryCustomFormatter.
-func CustomFormatter(o Opt) func(format string, args ...any) *url.URL {
+func CustomFormatter(o Opt) func(format string, args ...any) string {
 	f := TryCustomFormatter(o)
-	return func(format string, args ...any) *url.URL {
+	return func(format string, args ...any) string {
 		if result, err := f(format, args...); err != nil {
 			panic(err)
 		} else {
@@ -44,8 +44,8 @@ func CustomFormatter(o Opt) func(format string, args ...any) *url.URL {
 var cache = sync.Map{}
 
 // TryCustomFormatter generates a custom formatter function that returns an empty string.
-func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error) {
-	return func(format string, args ...any) (*url.URL, error) {
+func TryCustomFormatter(o Opt) func(format string, args ...any) (string, error) {
+	return func(format string, args ...any) (string, error) {
 		var ot *parseResult // original template
 		if v, ok := cache.Load(format); ok {
 			ot = v.(*parseResult)
@@ -53,13 +53,13 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 			var err error
 			ot, err = parse(format)
 			if err != nil {
-				return nil, err
+				return "", err
 			}
 			cache.Store(format, ot)
 		}
 		t, err := overwrite(ot, o)
 		if err != nil {
-			return nil, err
+			return "", err
 		}
 		r := &url.URL{}
 
@@ -76,7 +76,7 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 				case nil:
 					// do nothing
 				default:
-					return nil, fmt.Errorf("%w: invalid protocol value. only string param is available, but '%v'", ErrFormatFailed, args[t.protocol.index])
+					return "", fmt.Errorf("%w: invalid protocol value. only string param is available, but '%v'", ErrFormatFailed, args[t.protocol.index])
 				}
 			}
 		}
@@ -94,7 +94,7 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 				case nil: // omit scheme too
 					r.Scheme = ""
 				default:
-					return nil, fmt.Errorf("%w: invalid hostname value. only string param is available, but '%v'", ErrFormatFailed, args[t.hostname.index])
+					return "", fmt.Errorf("%w: invalid hostname value. only string param is available, but '%v'", ErrFormatFailed, args[t.hostname.index])
 				}
 			}
 		}
@@ -112,7 +112,7 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 				case nil:
 					// do nothing
 				default:
-					return nil, fmt.Errorf("%w: invalid port value. only int param is available, but '%v'", ErrFormatFailed, args[t.port.index])
+					return "", fmt.Errorf("%w: invalid port value. only int param is available, but '%v'", ErrFormatFailed, args[t.port.index])
 				}
 			}
 		}
@@ -217,16 +217,16 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 				query.Add(q.key, q.value.value)
 			} else if q.key != "" {
 				if err := updateQuery(q.key, args[q.value.index]); err != nil {
-					return nil, err
+					return "", err
 				}
 			} else if vs, ok := args[q.value.index].(url.Values); ok {
 				for key, values := range vs {
 					if err := updateQuery(key, values); err != nil {
-						return nil, err
+						return "", err
 					}
 				}
 			} else {
-				return nil, fmt.Errorf("%w: query set must be url.Values, but '%v'", ErrFormatFailed, args[q.value.index])
+				return "", fmt.Errorf("%w: query set must be url.Values, but '%v'", ErrFormatFailed, args[q.value.index])
 			}
 		}
 		r.RawQuery = query.Encode()
@@ -243,7 +243,7 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 				case nil:
 					// do nothing
 				default:
-					return nil, fmt.Errorf("%w: fragment must be a string, but '%v'", ErrFormatFailed, args[t.fragment.index])
+					return "", fmt.Errorf("%w: fragment must be a string, but '%v'", ErrFormatFailed, args[t.fragment.index])
 				}
 			}
 		}
@@ -260,7 +260,7 @@ func TryCustomFormatter(o Opt) func(format string, args ...any) (*url.URL, error
 			r.User = url.UserPassword(t.username, t.password)
 		}
 
-		return r, nil
+		return r.String(), nil
 	}
 }
 
